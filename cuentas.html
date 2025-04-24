@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autenticación por código</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        #codeInput {
+            color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Autenticación de Targetas</h1>
+        <form id="loginForm">
+            <label for="codeInput" style="color: rgb(255, 255, 255);">Ingresa tu código:</label>
+            <input type="text" id="codeInput" name="codeInput">
+            <button type="submit">Ingresar</button>
+        </form>
+
+        <script>
+            const validCodes = ['12345', '4556', '343545']; // Lista de códigos válidos
+            const redirectURL = 'https://yaanime.com'; // URL de redirección
+
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Evitar que el formulario se envíe
+
+                const codeInput = document.getElementById('codeInput').value;
+
+                if (validCodes.includes(codeInput)) {
+                    // Redirigir al usuario al sitio web
+                    window.location.href = redirectURL;
+                    // Obtener la dirección IP del usuario
+                    fetch('https://api64.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        const userIP = data.ip;
+                        // Guardar la dirección IP en un archivo de texto
+                        const fileContent = `Usuario: ${codeInput}, IP: ${userIP}\n`;
+                        const blob = new Blob([fileContent], {type: 'text/plain'});
+                        const fileName = 'usuarios_ips.txt';
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = fileName;
+                        link.click();
+                    })
+                    .catch(error => console.error('Error al obtener la dirección IP:', error));
+                } else {
+                    alert('Código incorrecto. Inténtalo de nuevo.'); // Código incorrecto
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
